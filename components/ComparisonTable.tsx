@@ -4,6 +4,7 @@ import type {
 	RowChange,
 	CellValue,
 	RowChangeType,
+	FilterState,
 } from "../types";
 import Icon from "./Icon";
 
@@ -60,17 +61,61 @@ const SummaryCard: React.FC<{
 	label: string;
 	value: number;
 	color: string;
-}> = ({ label, value, color }) => (
-	<div className={`flex-1 p-4 rounded-lg shadow-sm text-center ${color}`}>
-		<p className="text-2xl font-bold">{value}</p>
+	isActive: boolean;
+	onClick: () => void;
+}> = ({ label, value, color, isActive, onClick }) => (
+	<button
+		type="button"
+		className={`flex-1 p-4 rounded-lg shadow-sm text-center cursor-pointer transition-all duration-200 ${color} ${
+			isActive
+				? "border-4 border-black transform scale-[1.02]"
+				: "border-4 border-transparent opacity-60 hover:opacity-80"
+		}`}
+		onClick={onClick}
+	>
+		<div className="flex items-center justify-center mb-2">
+			<p className="text-2xl font-bold mr-2">{value}</p>
+			{isActive ? (
+				<svg
+					className="w-5 h-5 text-white"
+					fill="currentColor"
+					viewBox="0 0 20 20"
+					aria-hidden="true"
+				>
+					<path
+						fillRule="evenodd"
+						d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+						clipRule="evenodd"
+					/>
+				</svg>
+			) : (
+				<svg
+					className="w-5 h-5 text-white"
+					fill="currentColor"
+					viewBox="0 0 20 20"
+					aria-hidden="true"
+				>
+					<path
+						fillRule="evenodd"
+						d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+						clipRule="evenodd"
+					/>
+				</svg>
+			)}
+		</div>
 		<p className="text-sm uppercase tracking-wider">{label}</p>
-	</div>
+	</button>
 );
 
-const ComparisonTable: React.FC<{ result: ComparisonResult }> = ({
-	result,
-}) => {
+const ComparisonTable: React.FC<{
+	result: ComparisonResult;
+	filters: FilterState;
+	onFilterChange: (filterType: RowChangeType) => void;
+}> = ({ result, filters, onFilterChange }) => {
 	const { headers, rows, summary } = result;
+
+	// Filter rows based on active filters
+	const filteredRows = rows.filter((row) => filters[row.type]);
 
 	if (
 		rows.length === 0 &&
@@ -96,22 +141,34 @@ const ComparisonTable: React.FC<{ result: ComparisonResult }> = ({
 				Comparison Result
 			</h3>
 
-			<div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 text-white">
-				<SummaryCard label="Added" value={summary.added} color="bg-green-500" />
+			<div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-6 text-white">
+				<SummaryCard
+					label="Added"
+					value={summary.added}
+					color="bg-green-500"
+					isActive={filters.added}
+					onClick={() => onFilterChange("added")}
+				/>
 				<SummaryCard
 					label="Deleted"
 					value={summary.deleted}
 					color="bg-red-500"
+					isActive={filters.deleted}
+					onClick={() => onFilterChange("deleted")}
 				/>
 				<SummaryCard
 					label="Modified"
 					value={summary.modified}
 					color="bg-yellow-500"
+					isActive={filters.modified}
+					onClick={() => onFilterChange("modified")}
 				/>
 				<SummaryCard
 					label="Unchanged"
 					value={summary.unchanged}
 					color="bg-slate-500"
+					isActive={filters.unchanged}
+					onClick={() => onFilterChange("unchanged")}
 				/>
 			</div>
 
@@ -128,7 +185,7 @@ const ComparisonTable: React.FC<{ result: ComparisonResult }> = ({
 						</tr>
 					</thead>
 					<tbody>
-						{rows.map((row, rowIndex) => (
+						{filteredRows.map((row, rowIndex) => (
 							<tr
 								key={rowIndex}
 								className={`border-b ${getRowClass(row.type)}`}

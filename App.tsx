@@ -10,7 +10,13 @@ import {
 	getSheetNamesFromFile,
 	getHeadersFromFile,
 } from "./services/excelComparer";
-import type { ComparisonResult, KeyColumnConfig } from "./types";
+import type {
+	ComparisonResult,
+	KeyColumnConfig,
+	FilterState,
+	RowChangeType,
+} from "./types";
+import packageJson from "./package.json";
 
 function App() {
 	const [originalFile, setOriginalFile] = useState<File | null>(null);
@@ -31,6 +37,12 @@ function App() {
 	const [headerRowNumber, setHeaderRowNumber] = useState<number>(1);
 	const [isConfigurationCollapsed, setIsConfigurationCollapsed] =
 		useState<boolean>(false);
+	const [filters, setFilters] = useState<FilterState>({
+		added: true,
+		deleted: true,
+		modified: true,
+		unchanged: true,
+	});
 
 	const handleFileSelect = async (
 		file: File | null,
@@ -137,6 +149,13 @@ function App() {
 		loadHeaders();
 	}, [loadHeaders]);
 
+	const handleFilterChange = (filterType: RowChangeType) => {
+		setFilters((prev) => ({
+			...prev,
+			[filterType]: !prev[filterType],
+		}));
+	};
+
 	return (
 		<div className="min-h-screen bg-slate-100 font-sans text-slate-800">
 			{/* GitHub Stars Badge */}
@@ -159,7 +178,10 @@ function App() {
 					<div className="max-w-5xl mx-auto">
 						<header className="text-center mb-8 md:mb-12">
 							<h1 className="text-4xl md:text-5xl font-extrabold text-slate-900">
-								Excel Diff Tool
+								Excel Diff Tool{" "}
+								<span className="text-2xl md:text-3xl font-normal text-slate-600">
+									v{packageJson.version}
+								</span>
 							</h1>
 							<p className="mt-4 text-lg text-slate-600">
 								Compare a sheet from two{" "}
@@ -186,6 +208,9 @@ function App() {
 										className={`flex items-center justify-between ${isConfigurationCollapsed ? "py-3 px-4 bg-slate-50 rounded-lg border" : "mb-4"}`}
 									>
 										<div className="flex items-center">
+											<h3 className="text-lg font-medium text-slate-700">
+												Configuration
+											</h3>
 											<svg
 												className="w-5 h-5 text-slate-600 mr-2"
 												fill="none"
@@ -206,9 +231,6 @@ function App() {
 													d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
 												/>
 											</svg>
-											<h3 className="text-lg font-medium text-slate-700">
-												Configuration
-											</h3>
 										</div>
 										<button
 											type="button"
@@ -364,7 +386,13 @@ function App() {
 							<Loader />
 						</div>
 					)}
-					{comparisonResult && <ComparisonTable result={comparisonResult} />}
+					{comparisonResult && (
+						<ComparisonTable
+							result={comparisonResult}
+							filters={filters}
+							onFilterChange={handleFilterChange}
+						/>
+					)}
 				</div>
 			</main>
 			<footer className="text-center py-4 text-sm text-slate-500">

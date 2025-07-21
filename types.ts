@@ -38,3 +38,10 @@ export interface KeyColumnConfig {
 export interface HeaderRowConfig {
 	rowNumber: number; // 1-based row number
 }
+
+export interface FilterState {
+	added: boolean;
+	deleted: boolean;
+	modified: boolean;
+	unchanged: boolean;
+}
