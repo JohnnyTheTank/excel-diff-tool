@@ -1,12 +1,15 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import FileUpload from "./components/FileUpload";
 import ComparisonTable from "./components/ComparisonTable";
+import KeyColumnSelector from "./components/KeyColumnSelector";
+import HeaderRowSelector from "./components/HeaderRowSelector";
 import Loader from "./components/Loader";
 import {
 	compareExcelFiles,
 	getSheetNamesFromFile,
+	getHeadersFromFile,
 } from "./services/excelComparer";
-import type { ComparisonResult } from "./types";
+import type { ComparisonResult, KeyColumnConfig } from "./types";
 
 function App() {
 	const [originalFile, setOriginalFile] = useState<File | null>(null);
@@ -21,6 +24,10 @@ function App() {
 	const [selectedOriginalSheet, setSelectedOriginalSheet] =
 		useState<string>("");
 	const [selectedUpdatedSheet, setSelectedUpdatedSheet] = useState<string>("");
+	const [headers, setHeaders] = useState<string[]>([]);
+	const [selectedKeyColumns, setSelectedKeyColumns] =
+		useState<KeyColumnConfig | null>(null);
+	const [headerRowNumber, setHeaderRowNumber] = useState<number>(1);
 
 	const handleFileSelect = async (
 		file: File | null,
@@ -31,6 +38,7 @@ function App() {
 		setFile(file);
 		setComparisonResult(null);
 		setError(null);
+		setHeaderRowNumber(1); // Reset header row when file changes
 		if (file) {
 			try {
 				const names = await getSheetNamesFromFile(file);
@@ -54,6 +62,27 @@ function App() {
 		}
 	};
 
+	const loadHeaders = useCallback(async () => {
+		if (originalFile && selectedOriginalSheet) {
+			try {
+				const fileHeaders = await getHeadersFromFile(
+					originalFile,
+					selectedOriginalSheet,
+					headerRowNumber,
+				);
+				setHeaders(fileHeaders);
+				setSelectedKeyColumns(null); // Reset key column selection when headers change
+			} catch (err) {
+				console.error("Failed to load headers:", err);
+				setHeaders([]);
+				setSelectedKeyColumns(null);
+			}
+		} else {
+			setHeaders([]);
+			setSelectedKeyColumns(null);
+		}
+	}, [originalFile, selectedOriginalSheet, headerRowNumber]);
+
 	const handleCompare = useCallback(async () => {
 		if (
 			!originalFile ||
@@ -74,6 +103,8 @@ function App() {
 				updatedFile,
 				selectedOriginalSheet,
 				selectedUpdatedSheet,
+				selectedKeyColumns || undefined,
+				headerRowNumber,
 			);
 			setComparisonResult(result);
 		} catch (err) {
@@ -86,7 +117,19 @@ function App() {
 		} finally {
 			setIsLoading(false);
 		}
-	}, [originalFile, updatedFile, selectedOriginalSheet, selectedUpdatedSheet]);
+	}, [
+		originalFile,
+		updatedFile,
+		selectedOriginalSheet,
+		selectedUpdatedSheet,
+		selectedKeyColumns,
+		headerRowNumber,
+	]);
+
+	// Load headers when original file and sheet are selected
+	useEffect(() => {
+		loadHeaders();
+	}, [loadHeaders]);
 
 	return (
 		<div className="min-h-screen bg-slate-100 font-sans text-slate-800">
@@ -201,8 +244,27 @@ function App() {
 								</div>
 							)}
 
+							{(originalSheetNames.length > 0 ||
+								updatedSheetNames.length > 0) && (
+								<HeaderRowSelector
+									headerRowNumber={headerRowNumber}
+									onHeaderRowChange={setHeaderRowNumber}
+									disabled={isLoading}
+								/>
+							)}
+
+							{headers.length > 0 && (
+								<KeyColumnSelector
+									headers={headers}
+									selectedColumns={selectedKeyColumns}
+									onSelectionChange={setSelectedKeyColumns}
+									disabled={isLoading}
+								/>
+							)}
+
 							<div className="mt-8 text-center">
 								<button
+									type="button"
 									onClick={handleCompare}
 									disabled={
 										!originalFile ||

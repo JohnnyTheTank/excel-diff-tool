@@ -3,6 +3,8 @@ import type {
 	RowChange,
 	CellValue,
 	CellChange,
+	KeyColumnConfig,
+	HeaderRowConfig,
 } from "../types";
 
 // SheetJS is loaded from a CDN script in index.html, so we declare it as a global
@@ -35,11 +37,54 @@ const getSheetData = (
 	return XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: null });
 };
 
+export const getHeadersFromFile = async (
+	file: File,
+	sheetName: string,
+	headerRowNumber: number = 1,
+): Promise<string[]> => {
+	const buffer = await readFileAsArrayBuffer(file);
+	const data = getSheetData(buffer, sheetName);
+
+	if (data.length === 0 || headerRowNumber > data.length) {
+		return [];
+	}
+
+	const rawHeaders = data[headerRowNumber - 1] || []; // Convert to 0-based index
+	return rawHeaders.map((cell, index) => {
+		if (cell instanceof Date) {
+			return cell.toISOString().split("T")[0];
+		}
+		if (cell === null || cell === undefined || String(cell).trim() === "") {
+			return `Column ${index + 1}`;
+		}
+		return String(cell).trim();
+	});
+};
+
+const createCompositeKey = (
+	row: CellValue[],
+	keyColumnIndexes: number[],
+): string => {
+	const keyValues = keyColumnIndexes.map((index) => {
+		const value = row[index];
+		if (value instanceof Date) {
+			return value.toISOString();
+		}
+		if (value === null || value === undefined) {
+			return "";
+		}
+		return String(value);
+	});
+	return keyValues.join("|||"); // Using triple pipe as separator to avoid conflicts
+};
+
 export const compareExcelFiles = async (
 	originalFile: File,
 	updatedFile: File,
 	originalSheetName: string,
 	updatedSheetName: string,
+	keyColumns?: KeyColumnConfig,
+	headerRowNumber: number = 1,
 ): Promise<ComparisonResult> => {
 	const [originalBuffer, updatedBuffer] = await Promise.all([
 		readFileAsArrayBuffer(originalFile),
@@ -64,20 +109,33 @@ export const compareExcelFiles = async (
 		};
 	}
 
+	// Get headers from the specified header row
 	const rawHeaders =
-		(originalData.length > 0 ? originalData[0] : updatedData[0]) || [];
-	const headers = rawHeaders.map((cell) => {
+		(originalData.length >= headerRowNumber
+			? originalData[headerRowNumber - 1]
+			: updatedData.length >= headerRowNumber
+				? updatedData[headerRowNumber - 1]
+				: []) || [];
+
+	const headers = rawHeaders.map((cell, index) => {
 		if (cell instanceof Date) {
 			return cell.toISOString().split("T")[0];
 		}
-		if (cell === null || cell === undefined) {
-			return "";
+		if (cell === null || cell === undefined || String(cell).trim() === "") {
+			return `Column ${index + 1}`;
 		}
-		return String(cell);
+		return String(cell).trim();
 	});
 
-	const originalRows = originalData.length > 1 ? originalData.slice(1) : [];
-	const updatedRows = updatedData.length > 1 ? updatedData.slice(1) : [];
+	// Data rows start after the header row
+	const originalRows =
+		originalData.length > headerRowNumber
+			? originalData.slice(headerRowNumber)
+			: [];
+	const updatedRows =
+		updatedData.length > headerRowNumber
+			? updatedData.slice(headerRowNumber)
+			: [];
 
 	const comparisonRows: RowChange[] = [];
 	const summary = {
@@ -89,67 +147,151 @@ export const compareExcelFiles = async (
 		totalUpdated: updatedRows.length,
 	};
 
-	const maxRows = Math.max(originalRows.length, updatedRows.length);
+	if (keyColumns && keyColumns.columnIndexes.length > 0) {
+		// Use key columns for comparison
+		const originalMap = new Map<
+			string,
+			{ rowData: CellValue[]; rowIndex: number }
+		>();
 
-	for (let i = 0; i < maxRows; i++) {
-		const originalRow = originalRows[i];
-		const updatedRow = updatedRows[i];
-		const rowKey = i + 1; // Use line number as key (1-based)
-
-		if (originalRow && updatedRow) {
-			// Both rows exist - check if they're the same
-			if (JSON.stringify(originalRow) === JSON.stringify(updatedRow)) {
-				comparisonRows.push({
-					type: "unchanged",
-					key: rowKey,
-					rowData: updatedRow,
-					originalRowIndex: i + 1,
-					updatedRowIndex: i + 1,
-				});
-				summary.unchanged++;
-			} else {
-				// Rows are different - track changes
-				const changes = new Map<number, CellChange>();
-				for (
-					let j = 0;
-					j < Math.max(originalRow.length, updatedRow.length);
-					j++
-				) {
-					const oldValue = originalRow[j] ?? null;
-					const newValue = updatedRow[j] ?? null;
-					if (JSON.stringify(oldValue) !== JSON.stringify(newValue)) {
-						changes.set(j, { oldValue, newValue });
-					}
-				}
-				comparisonRows.push({
-					type: "modified",
-					key: rowKey,
-					rowData: updatedRow,
-					originalRowData: originalRow,
-					changes,
-					originalRowIndex: i + 1,
-					updatedRowIndex: i + 1,
-				});
-				summary.modified++;
+		// Build map of original rows using composite key
+		originalRows.forEach((row, index) => {
+			const compositeKey = createCompositeKey(row, keyColumns.columnIndexes);
+			if (compositeKey.trim() !== "") {
+				// Only add rows with non-empty keys
+				originalMap.set(compositeKey, { rowData: row, rowIndex: index + 1 });
 			}
-		} else if (updatedRow && !originalRow) {
-			// Row was added in updated file
-			comparisonRows.push({
-				type: "added",
-				key: rowKey,
-				rowData: updatedRow,
-				updatedRowIndex: i + 1,
-			});
-			summary.added++;
-		} else if (originalRow && !updatedRow) {
-			// Row was deleted from original file
+		});
+
+		// Process updated rows
+		updatedRows.forEach((updatedRow, updatedIndex) => {
+			const compositeKey = createCompositeKey(
+				updatedRow,
+				keyColumns.columnIndexes,
+			);
+			const originalEntry = originalMap.get(compositeKey);
+
+			if (originalEntry) {
+				const { rowData: originalRow, rowIndex: originalIndex } = originalEntry;
+				if (JSON.stringify(originalRow) === JSON.stringify(updatedRow)) {
+					comparisonRows.push({
+						type: "unchanged",
+						key: compositeKey,
+						rowData: updatedRow,
+						originalRowIndex: originalIndex,
+						updatedRowIndex: updatedIndex + 1,
+					});
+					summary.unchanged++;
+				} else {
+					const changes = new Map<number, CellChange>();
+					for (
+						let i = 0;
+						i < Math.max(originalRow.length, updatedRow.length);
+						i++
+					) {
+						const oldValue = originalRow[i] ?? null;
+						const newValue = updatedRow[i] ?? null;
+						if (JSON.stringify(oldValue) !== JSON.stringify(newValue)) {
+							changes.set(i, { oldValue, newValue });
+						}
+					}
+					comparisonRows.push({
+						type: "modified",
+						key: compositeKey,
+						rowData: updatedRow,
+						originalRowData: originalRow,
+						changes,
+						originalRowIndex: originalIndex,
+						updatedRowIndex: updatedIndex + 1,
+					});
+					summary.modified++;
+				}
+				originalMap.delete(compositeKey);
+			} else {
+				comparisonRows.push({
+					type: "added",
+					key: compositeKey || `added_${updatedIndex + 1}`,
+					rowData: updatedRow,
+					updatedRowIndex: updatedIndex + 1,
+				});
+				summary.added++;
+			}
+		});
+
+		// Add remaining original rows as deleted
+		originalMap.forEach(({ rowData, rowIndex }, key) => {
 			comparisonRows.push({
 				type: "deleted",
-				key: rowKey,
-				rowData: originalRow,
-				originalRowIndex: i + 1,
+				key,
+				rowData,
+				originalRowIndex: rowIndex,
 			});
 			summary.deleted++;
+		});
+	} else {
+		// Use line number comparison (original behavior)
+		const maxRows = Math.max(originalRows.length, updatedRows.length);
+
+		for (let i = 0; i < maxRows; i++) {
+			const originalRow = originalRows[i];
+			const updatedRow = updatedRows[i];
+			const rowKey = i + 1; // Use line number as key (1-based)
+
+			if (originalRow && updatedRow) {
+				// Both rows exist - check if they're the same
+				if (JSON.stringify(originalRow) === JSON.stringify(updatedRow)) {
+					comparisonRows.push({
+						type: "unchanged",
+						key: rowKey,
+						rowData: updatedRow,
+						originalRowIndex: i + 1,
+						updatedRowIndex: i + 1,
+					});
+					summary.unchanged++;
+				} else {
+					// Rows are different - track changes
+					const changes = new Map<number, CellChange>();
+					for (
+						let j = 0;
+						j < Math.max(originalRow.length, updatedRow.length);
+						j++
+					) {
+						const oldValue = originalRow[j] ?? null;
+						const newValue = updatedRow[j] ?? null;
+						if (JSON.stringify(oldValue) !== JSON.stringify(newValue)) {
+							changes.set(j, { oldValue, newValue });
+						}
+					}
+					comparisonRows.push({
+						type: "modified",
+						key: rowKey,
+						rowData: updatedRow,
+						originalRowData: originalRow,
+						changes,
+						originalRowIndex: i + 1,
+						updatedRowIndex: i + 1,
+					});
+					summary.modified++;
+				}
+			} else if (updatedRow && !originalRow) {
+				// Row was added in updated file
+				comparisonRows.push({
+					type: "added",
+					key: rowKey,
+					rowData: updatedRow,
+					updatedRowIndex: i + 1,
+				});
+				summary.added++;
+			} else if (originalRow && !updatedRow) {
+				// Row was deleted from original file
+				comparisonRows.push({
+					type: "deleted",
+					key: rowKey,
+					rowData: originalRow,
+					originalRowIndex: i + 1,
+				});
+				summary.deleted++;
+			}
 		}
 	}
 

@@ -61,23 +61,6 @@ A modern, web-based tool for comparing Excel files and highlighting differences 
 - **[React 19](https://react.dev/)** - Modern React with latest features
 - **[TypeScript](https://www.typescriptlang.org/)** - Type-safe JavaScript
 - **[Vite](https://vitejs.dev/)** - Fast build tool and dev server
-- **Modern Architecture** - Clean, maintainable codebase
-
-## 📁 Project Structure
-
-```
-excel-diff-tool/
-├── components/
-│   ├── ComparisonTable.tsx    # Results display component
-│   ├── FileUpload.tsx         # File upload interface
-│   ├── Icon.tsx               # Reusable icon component
-│   └── Loader.tsx             # Loading state component
-├── services/
-│   └── excelComparer.ts       # Core comparison logic
-├── App.tsx                    # Main application component
-├── types.ts                   # TypeScript type definitions
-└── index.tsx                  # Application entry point
-```
 
 ## 🔧 Available Scripts
 
@@ -115,13 +98,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- Built with modern React and TypeScript
-- Powered by Vite for fast development
-- Deployed on GitHub Pages
-- Modern web technologies and clean architecture
 
 ## 📧 Contact
 
