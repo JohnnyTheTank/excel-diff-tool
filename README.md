@@ -13,7 +13,7 @@ A modern, web-based tool for comparing Excel files and highlighting differences 
 
 ## ✨ Features
 
-- **🔒 Client-Side Processing**: Your files never leave your browser - complete privacyyar
+- **🔒 Client-Side Processing**: Your files never leave your browser - complete privacy
 - **📁 File Upload**: Drag and drop or browse to upload Excel files (.xlsx, .xls)
 - **📋 Sheet Selection**: Choose specific sheets from each file to compare
 - **🔍 Intelligent Comparison**: Advanced analysis to identify and highlight differences
@@ -84,16 +84,23 @@ excel-diff-tool/
 - `yarn dev` - Start development server
 - `yarn build` - Build for production
 - `yarn preview` - Preview production build
-- `yarn deploy` - Deploy to GitHub Pages
 
 ## 🚀 Deployment
 
-This project is configured for easy deployment to GitHub Pages:
+This project is configured for automatic deployment to GitHub Pages using GitHub Actions:
 
-1. **Automatic Deployment**: Push to the `main` branch triggers automatic deployment
-2. **Manual Deployment**: Run `yarn deploy` to deploy manually
+1. **Automatic Deployment**: Every push to the `main` branch automatically triggers a deployment
+2. **GitHub Actions Workflow**: The deployment is handled by `.github/workflows/deploy.yml`
+3. **No Manual Steps Required**: Just commit and push your changes to deploy
 
-The site will is available at: [johnnythetank.github.io/excel-diff-tool/](https://johnnythetank.github.io/excel-diff-tool/)
+The site is available at: [johnnythetank.github.io/excel-diff-tool/](https://johnnythetank.github.io/excel-diff-tool/)
+
+### Deployment Process
+
+1. Code is pushed to `main` branch
+2. GitHub Actions workflow builds the project with Vite
+3. Built files are automatically deployed to GitHub Pages
+4. Site is updated within a few minutes
 
 ## 🤝 Contributing
 
