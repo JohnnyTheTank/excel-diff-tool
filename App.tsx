@@ -1,22 +1,23 @@
 /** biome-ignore-all lint/nursery/useUniqueElementIds: <explanation> */
-import React, { useState, useCallback, useEffect } from "react";
-import FileUpload from "./components/FileUpload";
+import type React from "react";
+import { useCallback, useEffect, useState } from "react";
 import ComparisonTable from "./components/ComparisonTable";
-import KeyColumnSelector from "./components/KeyColumnSelector";
+import FileUpload from "./components/FileUpload";
 import HeaderRowSelector from "./components/HeaderRowSelector";
+import KeyColumnSelector from "./components/KeyColumnSelector";
 import Loader from "./components/Loader";
+import packageJson from "./package.json";
 import {
 	compareExcelFiles,
-	getSheetNamesFromFile,
 	getHeadersFromFile,
+	getSheetNamesFromFile,
 } from "./services/excelComparer";
 import type {
 	ComparisonResult,
-	KeyColumnConfig,
 	FilterState,
+	KeyColumnConfig,
 	RowChangeType,
 } from "./types";
-import packageJson from "./package.json";
 
 function App() {
 	const [originalFile, setOriginalFile] = useState<File | null>(null);
@@ -406,7 +407,7 @@ function App() {
 					>
 						JohnnyTheTank
 					</a>{" "}
-					© 2025
+					© {new Date().getFullYear()}
 				</p>
 			</footer>
 		</div>
