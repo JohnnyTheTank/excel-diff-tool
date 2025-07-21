@@ -9,7 +9,7 @@ A modern, web-based tool for comparing Excel files and highlighting differences 
 
 ## 🌐 Live Demo
 
-**[Try it now → johnnythetank.github.io/excel-diff-tool/](https://johnnythetank.github.io/excel-diff-tool/)**
+**Try it now → [johnnythetank.github.io/excel-diff-tool/](https://johnnythetank.github.io/excel-diff-tool/)**
 
 ## ✨ Features
 
@@ -19,7 +19,6 @@ A modern, web-based tool for comparing Excel files and highlighting differences 
 - **🔍 Intelligent Comparison**: Advanced analysis to identify and highlight differences
 - **📊 Visual Results**: Clear, tabular display of comparison results
 - **🚀 Fast & Responsive**: Built with modern web technologies for optimal performance
-- **📱 Mobile Friendly**: Works seamlessly on desktop and mobile devices
 
 ## 🚀 Getting Started
 
