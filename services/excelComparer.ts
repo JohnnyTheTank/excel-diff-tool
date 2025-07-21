@@ -1,10 +1,9 @@
 import type {
-	ComparisonResult,
-	RowChange,
-	CellValue,
 	CellChange,
+	CellValue,
+	ComparisonResult,
 	KeyColumnConfig,
-	HeaderRowConfig,
+	RowChange,
 } from "../types";
 
 // SheetJS is loaded from a CDN script in index.html, so we declare it as a global

@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 
 interface HeaderRowSelectorProps {
 	headerRowNumber: number;
@@ -16,7 +16,7 @@ const HeaderRowSelector: React.FC<HeaderRowSelectorProps> = ({
 	const inputId = `header-row-${Math.random().toString(36).substr(2, 9)}`;
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = parseInt(e.target.value, 10);
-		if (!isNaN(value) && value > 0 && value <= maxRows) {
+		if (!Number.isNaN(value) && value > 0 && value <= maxRows) {
 			onHeaderRowChange(value);
 		}
 	};

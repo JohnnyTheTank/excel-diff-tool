@@ -1,22 +1,23 @@
 /** biome-ignore-all lint/nursery/useUniqueElementIds: <explanation> */
-import React, { useState, useCallback, useEffect } from "react";
-import FileUpload from "./components/FileUpload";
+import type React from "react";
+import { useCallback, useEffect, useState } from "react";
 import ComparisonTable from "./components/ComparisonTable";
-import KeyColumnSelector from "./components/KeyColumnSelector";
+import FileUpload from "./components/FileUpload";
 import HeaderRowSelector from "./components/HeaderRowSelector";
+import KeyColumnSelector from "./components/KeyColumnSelector";
 import Loader from "./components/Loader";
+import packageJson from "./package.json";
 import {
 	compareExcelFiles,
-	getSheetNamesFromFile,
 	getHeadersFromFile,
+	getSheetNamesFromFile,
 } from "./services/excelComparer";
 import type {
 	ComparisonResult,
-	KeyColumnConfig,
 	FilterState,
+	KeyColumnConfig,
 	RowChangeType,
 } from "./types";
-import packageJson from "./package.json";
 
 function App() {
 	const [originalFile, setOriginalFile] = useState<File | null>(null);
@@ -158,25 +159,25 @@ function App() {
 
 	return (
 		<div className="min-h-screen bg-slate-100 font-sans text-slate-800">
-			{/* GitHub Stars Badge */}
-			<div className="fixed top-4 right-4 z-10">
-				<a
-					href="https://github.com/JohnnyTheTank/excel-diff-tool"
-					target="_blank"
-					rel="noopener noreferrer"
-					className="inline-block hover:scale-105 transition-transform duration-200"
-				>
-					<img
-						src="https://img.shields.io/github/stars/JohnnyTheTank/excel-diff-tool?style=social"
-						alt="GitHub Stars"
-						className="h-6"
-					/>
-				</a>
-			</div>
 			<main>
 				<div className="container mx-auto px-4 pt-8 md:pt-12">
 					<div className="max-w-5xl mx-auto">
-						<header className="text-center mb-8 md:mb-12">
+						<header className="text-center mb-8 md:mb-12 relative">
+							{/* GitHub Stars Badge */}
+							<div className="absolute top-0 right-0">
+								<a
+									href="https://github.com/JohnnyTheTank/excel-diff-tool"
+									target="_blank"
+									rel="noopener noreferrer"
+									className="inline-block hover:scale-105 transition-transform duration-200"
+								>
+									<img
+										src="https://img.shields.io/github/stars/JohnnyTheTank/excel-diff-tool?style=social"
+										alt="GitHub Stars"
+										className="h-6"
+									/>
+								</a>
+							</div>
 							<h1 className="text-4xl md:text-5xl font-extrabold text-slate-900">
 								Excel Diff Tool{" "}
 								<span className="text-2xl md:text-3xl font-normal text-slate-600">
@@ -406,7 +407,7 @@ function App() {
 					>
 						JohnnyTheTank
 					</a>{" "}
-					© 2025
+					© {new Date().getFullYear()}
 				</p>
 			</footer>
 		</div>

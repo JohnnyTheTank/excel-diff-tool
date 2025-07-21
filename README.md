@@ -100,7 +100,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📧 Contact
 
-**JohnnyTheTank** - [@JohnnyTheTank](https://github.com/JohnnyTheTank)
+**Author** - [@JohnnyTheTank](https://github.com/JohnnyTheTank)
 
 Project Link: [https://github.com/JohnnyTheTank/excel-diff-tool](https://github.com/JohnnyTheTank/excel-diff-tool)
 
