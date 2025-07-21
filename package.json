@@ -1,7 +1,7 @@
 {
   "name": "excel-diff-tool",
   "private": false,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A modern web-based tool for comparing Excel files and highlighting differences between sheets",
   "type": "module",
   "author": "JohnnyTheTank",

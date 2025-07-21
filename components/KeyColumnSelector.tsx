@@ -101,14 +101,14 @@ const KeyColumnSelector: React.FC<KeyColumnSelectorProps> = ({
 				)}
 			</div>
 
-			<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+			<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 max-h-64 overflow-y-auto border border-slate-200 rounded-md p-3 bg-slate-50">
 				{headers.map((header, index) => {
 					const isSelected =
 						selectedColumns?.columnIndexes.includes(index) || false;
 					return (
 						<label
 							key={header || `empty-header-${Math.random()}`}
-							className={`flex items-center p-3 rounded-md border cursor-pointer transition-colors ${
+							className={`flex items-center p-3 rounded-md border cursor-pointer transition-colors min-w-0 ${
 								isSelected
 									? "bg-blue-100 border-blue-300 text-blue-800"
 									: "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
@@ -143,8 +143,11 @@ const KeyColumnSelector: React.FC<KeyColumnSelectorProps> = ({
 									</svg>
 								)}
 							</div>
-							<div>
-								<div className="text-sm font-medium truncate">
+							<div className="min-w-0 flex-1">
+								<div
+									className="text-sm font-medium truncate"
+									title={header || `Column ${index + 1}`}
+								>
 									{header || `Column ${index + 1}`}
 								</div>
 								<div className="text-xs text-slate-500">Column {index + 1}</div>
