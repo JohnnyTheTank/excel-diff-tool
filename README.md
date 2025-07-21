@@ -13,12 +13,12 @@ A modern, web-based tool for comparing Excel files and highlighting differences 
 
 ## ✨ Features
 
+- **🔒 Client-Side Processing**: Your files never leave your browser - complete privacyyar
 - **📁 File Upload**: Drag and drop or browse to upload Excel files (.xlsx, .xls)
 - **📋 Sheet Selection**: Choose specific sheets from each file to compare
 - **🔍 Intelligent Comparison**: Advanced analysis to identify and highlight differences
 - **📊 Visual Results**: Clear, tabular display of comparison results
 - **🚀 Fast & Responsive**: Built with modern web technologies for optimal performance
-- **🔒 Client-Side Processing**: Your files never leave your browser - complete privacy
 - **📱 Mobile Friendly**: Works seamlessly on desktop and mobile devices
 
 ## 🚀 Getting Started

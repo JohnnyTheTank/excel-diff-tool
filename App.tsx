@@ -105,7 +105,8 @@ function App() {
 								files and see the changes.
 							</p>
 							<p className="text-sm text-slate-500 mt-2">
-								All processing is done in your browser. No data is uploaded.
+								100% privacy-focused. All processing is done in your browser. No
+								data is uploaded.
 							</p>
 						</header>
 
@@ -224,7 +225,18 @@ function App() {
 				</div>
 			</main>
 			<footer className="text-center py-4 text-sm text-slate-500">
-				<p>Built with React & Tailwind CSS.</p>
+				<p>
+					Built with React & Tailwind CSS by{" "}
+					<a
+						href="https://github.com/JohnnyTheTank"
+						target="_blank"
+						rel="noopener noreferrer"
+						className="text-blue-600 hover:text-blue-800 underline"
+					>
+						JohnnyTheTank
+					</a>{" "}
+					© 2025
+				</p>
 			</footer>
 		</div>
 	);
