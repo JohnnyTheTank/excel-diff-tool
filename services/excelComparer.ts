@@ -64,6 +64,7 @@ export const getHeadersFromFile = async (
 const createCompositeKey = (
 	row: CellValue[],
 	keyColumnIndexes: number[],
+	occurrenceNumber?: number,
 ): string => {
 	const keyValues = keyColumnIndexes.map((index) => {
 		const value = row[index];
@@ -75,7 +76,13 @@ const createCompositeKey = (
 		}
 		return String(value);
 	});
-	return keyValues.join("|||"); // Using triple pipe as separator to avoid conflicts
+	const baseKey = keyValues.join("|||"); // Using triple pipe as separator to avoid conflicts
+
+	// Add occurrence number for duplicate handling
+	if (occurrenceNumber !== undefined) {
+		return `${baseKey}|||#${occurrenceNumber}`;
+	}
+	return baseKey;
 };
 
 export const compareExcelFiles = async (
@@ -154,21 +161,71 @@ export const compareExcelFiles = async (
 			{ rowData: CellValue[]; rowIndex: number }
 		>();
 
-		// Build map of original rows using composite key
+		// First pass: count occurrences of each base key in original data
+		const originalKeyOccurrences = new Map<string, number>();
+		originalRows.forEach((row) => {
+			const baseKey = createCompositeKey(row, keyColumns.columnIndexes);
+			if (baseKey.trim() !== "") {
+				originalKeyOccurrences.set(
+					baseKey,
+					(originalKeyOccurrences.get(baseKey) || 0) + 1,
+				);
+			}
+		});
+
+		// Second pass: build map with unique composite keys for original data
+		const originalKeyCounters = new Map<string, number>();
 		originalRows.forEach((row, index) => {
-			const compositeKey = createCompositeKey(row, keyColumns.columnIndexes);
-			if (compositeKey.trim() !== "") {
-				// Only add rows with non-empty keys
+			const baseKey = createCompositeKey(row, keyColumns.columnIndexes);
+			if (baseKey.trim() !== "") {
+				const occurrenceCount = originalKeyOccurrences.get(baseKey) || 1;
+				let compositeKey = baseKey;
+
+				if (occurrenceCount > 1) {
+					// Handle duplicates by adding occurrence number
+					const currentCount = (originalKeyCounters.get(baseKey) || 0) + 1;
+					originalKeyCounters.set(baseKey, currentCount);
+					compositeKey = createCompositeKey(
+						row,
+						keyColumns.columnIndexes,
+						currentCount,
+					);
+				}
+
 				originalMap.set(compositeKey, { rowData: row, rowIndex: index + 1 });
 			}
 		});
 
-		// Process updated rows
+		// Count occurrences in updated data
+		const updatedKeyOccurrences = new Map<string, number>();
+		updatedRows.forEach((row) => {
+			const baseKey = createCompositeKey(row, keyColumns.columnIndexes);
+			if (baseKey.trim() !== "") {
+				updatedKeyOccurrences.set(
+					baseKey,
+					(updatedKeyOccurrences.get(baseKey) || 0) + 1,
+				);
+			}
+		});
+
+		// Process updated rows with duplicate handling
+		const updatedKeyCounters = new Map<string, number>();
 		updatedRows.forEach((updatedRow, updatedIndex) => {
-			const compositeKey = createCompositeKey(
-				updatedRow,
-				keyColumns.columnIndexes,
-			);
+			const baseKey = createCompositeKey(updatedRow, keyColumns.columnIndexes);
+			const occurrenceCount = updatedKeyOccurrences.get(baseKey) || 1;
+			let compositeKey = baseKey;
+
+			if (occurrenceCount > 1) {
+				// Handle duplicates by adding occurrence number
+				const currentCount = (updatedKeyCounters.get(baseKey) || 0) + 1;
+				updatedKeyCounters.set(baseKey, currentCount);
+				compositeKey = createCompositeKey(
+					updatedRow,
+					keyColumns.columnIndexes,
+					currentCount,
+				);
+			}
+
 			const originalEntry = originalMap.get(compositeKey);
 
 			if (originalEntry) {

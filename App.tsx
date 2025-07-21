@@ -244,16 +244,18 @@ function App() {
 								</div>
 							)}
 
-							{(originalSheetNames.length > 0 ||
-								updatedSheetNames.length > 0) && (
-								<HeaderRowSelector
-									headerRowNumber={headerRowNumber}
-									onHeaderRowChange={setHeaderRowNumber}
-									disabled={isLoading}
-								/>
-							)}
+							{originalFile &&
+								updatedFile &&
+								(originalSheetNames.length > 0 ||
+									updatedSheetNames.length > 0) && (
+									<HeaderRowSelector
+										headerRowNumber={headerRowNumber}
+										onHeaderRowChange={setHeaderRowNumber}
+										disabled={isLoading}
+									/>
+								)}
 
-							{headers.length > 0 && (
+							{originalFile && updatedFile && headers.length > 0 && (
 								<KeyColumnSelector
 									headers={headers}
 									selectedColumns={selectedKeyColumns}
