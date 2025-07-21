@@ -1,5 +1,5 @@
 {
   "name": "Excel File Diff Tool",
-  "description": "A client-side tool to compare two Excel files and highlight the differences between their first sheets. Upload an 'original' and an 'updated' file to see what has been added, removed, or modified.",
+  "description": "A client-side tool to compare two Excel files and highlight the differences between selected sheets. Upload an 'original' and an 'updated' file to see what has been added, removed, or modified.",
   "requestFramePermissions": []
 }
