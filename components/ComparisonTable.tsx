@@ -1,10 +1,9 @@
-import React from "react";
+import type React from "react";
 import type {
-	ComparisonResult,
-	RowChange,
 	CellValue,
-	RowChangeType,
+	ComparisonResult,
 	FilterState,
+	RowChangeType,
 } from "../types";
 import Icon from "./Icon";
 
@@ -172,13 +171,17 @@ const ComparisonTable: React.FC<{
 				/>
 			</div>
 
-			<div className="overflow-x-auto bg-white rounded-lg shadow-md">
+			<div className="bg-white rounded-lg shadow-md max-h-[90vh] overflow-auto">
 				<table className="w-full text-sm text-left text-slate-500">
-					<thead className="text-xs text-slate-700 uppercase bg-slate-100">
+					<thead className="text-xs text-slate-700 uppercase bg-slate-100 sticky top-0 z-10">
 						<tr>
-							<th scope="col" className="px-4 py-3 w-8"></th>
+							<th scope="col" className="px-4 py-3 w-8 bg-slate-100"></th>
 							{headers.map((header, index) => (
-								<th key={index} scope="col" className="px-6 py-3 min-w-[150px]">
+								<th
+									key={index}
+									scope="col"
+									className="px-6 py-3 min-w-[150px] bg-slate-100"
+								>
 									{header}
 								</th>
 							))}

@@ -1,4 +1,5 @@
-import React from "react";
+/** biome-ignore-all lint/a11y/noSvgWithoutTitle: <explanation> */
+import type React from "react";
 import type { KeyColumnConfig } from "../types";
 
 interface KeyColumnSelectorProps {
@@ -84,7 +85,7 @@ const KeyColumnSelector: React.FC<KeyColumnSelectorProps> = ({
 								</span>
 								<span className="text-sm text-blue-700 ml-1">
 									{selectedColumns.columnNames
-										.filter((name) => name && name.trim())
+										.filter((name) => name?.trim())
 										.join(", ")}
 								</span>
 							</div>
