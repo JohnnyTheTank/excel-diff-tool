@@ -11,7 +11,7 @@ import Icon from "./Icon";
 const getRowClass = (type: RowChangeType): string => {
 	switch (type) {
 		case "added":
-			return "bg-green-50";
+			return "bg-green-100";
 		case "deleted":
 			return "bg-red-50";
 		case "modified":
