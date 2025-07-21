@@ -90,6 +90,21 @@ function App() {
 
 	return (
 		<div className="min-h-screen bg-slate-100 font-sans text-slate-800">
+			{/* GitHub Stars Badge */}
+			<div className="fixed top-4 right-4 z-10">
+				<a
+					href="https://github.com/JohnnyTheTank/excel-diff-tool"
+					target="_blank"
+					rel="noopener noreferrer"
+					className="inline-block hover:scale-105 transition-transform duration-200"
+				>
+					<img
+						src="https://img.shields.io/github/stars/JohnnyTheTank/excel-diff-tool?style=social"
+						alt="GitHub Stars"
+						className="h-6"
+					/>
+				</a>
+			</div>
 			<main>
 				<div className="container mx-auto px-4 pt-8 md:pt-12">
 					<div className="max-w-5xl mx-auto">

@@ -9,7 +9,7 @@ A modern, web-based tool for comparing Excel files and highlighting differences 
 
 ## 🌐 Live Demo
 
-**[Try it now →](https://johnnythetank.github.io/excel-diff-tool/)**
+**[Try it now → johnnythetank.github.io/excel-diff-tool/](https://johnnythetank.github.io/excel-diff-tool/)**
 
 ## ✨ Features
 
@@ -93,7 +93,7 @@ This project is configured for easy deployment to GitHub Pages:
 1. **Automatic Deployment**: Push to the `main` branch triggers automatic deployment
 2. **Manual Deployment**: Run `yarn deploy` to deploy manually
 
-The site will be available at: `https://johnnythetank.github.io/excel-diff-tool/`
+The site will is available at: [johnnythetank.github.io/excel-diff-tool/](https://johnnythetank.github.io/excel-diff-tool/)
 
 ## 🤝 Contributing
 
