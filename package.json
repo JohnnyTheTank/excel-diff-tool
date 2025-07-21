@@ -1,0 +1,43 @@
+{
+  "name": "excel-diff-tool",
+  "private": false,
+  "version": "1.0.0",
+  "description": "A modern web-based tool for comparing Excel files and highlighting differences between sheets",
+  "type": "module",
+  "author": "JohnnyTheTank",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JohnnyTheTank/excel-diff-tool.git"
+  },
+  "homepage": "https://johnnythetank.github.io/excel-diff-tool/",
+  "bugs": {
+    "url": "https://github.com/JohnnyTheTank/excel-diff-tool/issues"
+  },
+  "keywords": [
+    "excel",
+    "diff",
+    "comparison",
+    "xlsx",
+    "spreadsheet",
+    "react",
+    "typescript",
+    "vite"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "deploy": "yarn build && gh-pages -d dist"
+  },
+  "dependencies": {
+    "react-dom": "^19.1.0",
+    "react": "^19.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "typescript": "~5.7.2",
+    "vite": "^6.2.0",
+    "gh-pages": "^6.1.1"
+  }
+}
